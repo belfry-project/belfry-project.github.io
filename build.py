@@ -126,7 +126,7 @@ def ee_ansible_core(refs):
 
 
 def operator_base(refs):
-    return search(r'^FROM quay\.io/operator-framework/ansible-operator:(v[\d.]+)', source('operator', refs, 'Dockerfile'), 'ansible-operator base image')
+    return search(r'^FROM (?:quay\.io/operator-framework|ghcr\.io/belfry-project)/ansible-operator:(v[\d.]+)', source('operator', refs, 'Dockerfile'), 'ansible-operator base image')
 
 
 def operator_kubernetes_core(refs):
