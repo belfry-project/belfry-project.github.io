@@ -18,6 +18,23 @@ categories:
 
 changes:
   - category: upgrade
+    title: Documentation for installing Belfry and migrating from AWX
+    description: >-
+      Step-by-step guides for people who know AWX: installing Belfry with the operator
+      manifest or the Helm chart, migrating an AWX 24.6.1 installation in place (with a
+      backup and a way back), upgrades, backups, execution environments and image
+      verification. The AWX and AWX Operator reference documentation is published for
+      Belfry next to them.
+    links:
+      - belfry-project/belfry#32
+      - belfry-project/belfry-operator#20
+    urls:
+      - title: Documentation
+        url: https://belfry-project.github.io/docs/
+      - title: Migrating from AWX
+        url: https://belfry-project.github.io/docs/migrate/
+
+  - category: upgrade
     title: Tested upgrade from AWX 24.6.1
     description: >-
       An existing AWX 24.6.1 installation is upgraded by replacing awx-operator 2.19.1
