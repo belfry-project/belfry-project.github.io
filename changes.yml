@@ -179,6 +179,20 @@ changes:
       - belfry-project/belfry#16
 
   - category: independence
+    title: Belfry name and logo instead of the AWX trademarks
+    description: >-
+      The web UI, the REST API browser, the error pages and the documentation show
+      the Belfry name and logo. AWX's logos and mascot are no longer shipped. The
+      interfaces automation depends on stay the same: API paths, the awx.awx
+      collection, the awxkit CLI and the AWX resource kind in Kubernetes.
+    links:
+      - belfry-project/belfry#30
+      - belfry-project/belfry-ui#9
+      - belfry-project/belfry-ee#13
+      - belfry-project/belfry-operator#18
+      - belfry-project/helm-charts#8
+
+  - category: independence
     title: Built, tested and published entirely on GitHub
     description: >-
       Belfry no longer depends on Quay, Ansible Galaxy, PyPI, SonarCloud, AWS or Red Hat's
