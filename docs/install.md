@@ -186,7 +186,7 @@ See [network and TLS configuration](https://belfry-project.github.io/docs/operat
 curl -s https://belfry.example.com/api/v2/ping/ | python3 -m json.tool
 ```
 
-The `version` field shows the Belfry version. In the UI, **Administration > Execution Environments** lists `AWX EE (latest)` and `AWX EE ({{ release.version }})`, both from `ghcr.io/belfry-project/belfry-ee`.
+The `version` field shows the Belfry version. In the UI, **Administration > Execution Environments** lists `AWX EE (latest)` and `AWX EE ({{ release.version }})`, both from `ghcr.io/belfry-project/belfry-ee` (see [Execution environments](execution-environments.md#what-is-in-belfry-ee)).
 
 Next steps:
 

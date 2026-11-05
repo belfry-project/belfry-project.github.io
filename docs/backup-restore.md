@@ -49,7 +49,7 @@ kubectl -n awx delete pod backup-copy
 
 ## Restoring
 
-Restore into a **new** instance name, or delete the existing instance first. When you delete an `AWX` resource, the operator keeps its secrets, and the PostgreSQL PVC stays too; delete them if you restore under the same name, so that the restore recreates them from the backup:
+Restore into a **new** instance name, or delete the existing instance first. Even under a new name, the restored instance uses some of the original secret names (`<original>-admin-password`, `<original>-secret-key`, `<original>-broadcast-websocket`), and the restore overwrites them with the backed-up values, which is harmless for a backup of the same instance. The admin password is the one from the backup: read it from the secret named in `status.adminPasswordSecret` of the restored `AWX` resource. When you delete an `AWX` resource, the operator keeps its secrets, and the PostgreSQL PVC stays too; delete them if you restore under the same name, so that the restore recreates them from the backup:
 
 ```bash
 kubectl -n awx delete awx awx --wait
@@ -79,4 +79,4 @@ The restore is done when the status shows `restoreComplete: true`. The operator 
 To restore from a backup that is not an `AWXBackup` resource any more, set `backup_pvc` and `backup_dir` instead of `backup_name`.
 
 !!! note "Tested"
-    The [upgrade test](migrate.md#what-the-upgrade-test-covers) backs up AWX {{ awx.version }} with awx-operator {{ awx.operator_version }} and restores it with belfry-operator into a new instance, then checks the data, the credential secrets and a new job there.
+    The [upgrade test](migrate.md#what-the-upgrade-test-covers) is being extended ([belfry-operator#17](https://github.com/belfry-project/belfry-operator/pull/17)) to back up AWX {{ awx.version }} with awx-operator {{ awx.operator_version }}, restore it with belfry-operator into a new instance, and check the data, the credential secrets and a new job there.

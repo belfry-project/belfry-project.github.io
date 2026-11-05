@@ -5,7 +5,7 @@ This guide moves an existing AWX installation on Kubernetes to Belfry **in place
 It takes about as long as an AWX upgrade: the web and task pods are replaced and the database is migrated, so plan a short maintenance window. Running jobs are interrupted.
 
 !!! success "Tested every week"
-    The steps below follow the automated [upgrade test](#what-the-upgrade-test-covers), which installs AWX {{ awx.version }} with awx-operator {{ awx.operator_version }}, creates data, takes a backup, switches to belfry-operator and checks the result. Steps the test does not cover are marked **Not covered by the upgrade test**.
+    The steps below follow the automated [upgrade test](#what-the-upgrade-test-covers), which installs AWX {{ awx.version }} with awx-operator {{ awx.operator_version }}, creates data, switches to belfry-operator and checks the result. Steps the test does not cover are marked **Not covered by the upgrade test**.
 
 ## Overview
 
@@ -186,7 +186,7 @@ The operator reconciles your `AWX` resource within a minute. What happens:
 
 1. The web and task deployments get the Belfry image `ghcr.io/belfry-project/belfry:{{ release.version }}`, the Redis 8 sidecar (`docker.io/redis:8.x`, instead of Redis 7) and init containers from `belfry-ee`. Redis only holds transient data (the websocket and dispatcher queues), so nothing needs to be migrated there.
 2. A Job `awx-migration-<hash>` runs the database migrations from AWX {{ awx.version }} to Belfry on the existing PostgreSQL 15 database. PostgreSQL itself is not changed.
-3. The task pod registers the managed execution environments: `AWX EE (latest)` now points to `ghcr.io/belfry-project/belfry-ee:latest`, `AWX EE ({{ release.version }})` is added, and the Control Plane Execution Environment uses `belfry-ee`. See [step 7](#7-update-execution-environments-and-playbooks) for `AWX EE ({{ awx.version }})`.
+3. The task pod registers the managed execution environments: `AWX EE (latest)` now points to `{{ release.latest_ee_image }}`, `AWX EE ({{ release.version }})` (`belfry-ee:{{ release.version }}`) is added, and the Control Plane Execution Environment uses `belfry-ee:{{ release.version }}`. See [step 7](#7-update-execution-environments-and-playbooks) for `AWX EE ({{ awx.version }})`.
 4. The `AWX` resource status gets the new `version`, and `upgradedFrom: {{ awx.version }}`.
 
 Follow it:
@@ -296,7 +296,7 @@ Then delete the old execution environment if nothing uses it.
 The restored `AWX` resource gets the spec from the backup, so it runs AWX {{ awx.version }} again.
 
 !!! note "Restoring the AWX backup with belfry-operator"
-    You can also restore the AWX {{ awx.version }} backup with **belfry-operator**: the restored instance then runs Belfry, and the operator migrates the restored database. This is how to start over if the in-place switch failed halfway. The upgrade test covers it: it restores the {{ awx.version }} backup into a new instance and checks the same data there.
+    You can also restore the AWX {{ awx.version }} backup with **belfry-operator**: the restored instance then runs Belfry, and the operator migrates the restored database with a migration Job. This is how to start over if the in-place switch failed halfway, or how to migrate into a new instance (or another cluster) while the AWX instance keeps running. The restored instance gets the admin password of the AWX instance; read it from the secret named in `status.adminPasswordSecret` of the new `AWX` resource. This path is being added to the upgrade test ([belfry-operator#17](https://github.com/belfry-project/belfry-operator/pull/17)).
 
 ## What the upgrade test covers
 
@@ -304,10 +304,10 @@ The workflow [`upgrade-test.yml`](https://github.com/belfry-project/belfry-opera
 
 1. installs awx-operator {{ awx.operator_version }} (with the kube-rbac-proxy image from quay.io) and an `AWX` resource without image fields, which runs AWX {{ awx.version }};
 2. creates an organization, an inventory with a host, a credential with a secret, a project from Git, a job template, and runs a job that uses the secret and caches facts;
-3. backs it up with an `AWXBackup`;
+3. backs it up with an `AWXBackup` (being added in [belfry-operator#17](https://github.com/belfry-project/belfry-operator/pull/17));
 4. applies belfry-operator's `config/default` over awx-operator (`make deploy`) and waits until the web and task deployments run the Belfry image;
 5. checks that the version changed, that all objects, the old job with its output and the cached facts survived, and that a new job runs in `belfry-ee`, decrypts the old credential and updates the facts;
-6. deletes that instance, restores the {{ awx.version }} backup with belfry-operator into a new instance with an `AWXRestore`, checks that the operator ran a migration Job for it, and verifies the same data and a new job there.
+6. being added in [belfry-operator#17](https://github.com/belfry-project/belfry-operator/pull/17): deletes that instance, restores the {{ awx.version }} backup with belfry-operator into a new instance with an `AWXRestore`, checks that the operator ran a migration Job for it, and verifies the same data and a new job there.
 
 [Latest runs](https://github.com/belfry-project/belfry-operator/actions/workflows/upgrade-test.yml).
 

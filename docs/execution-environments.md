@@ -15,7 +15,10 @@ It also contains ansible-runner, receptor, `awxkit`, `ansible-sign`, git, git-lf
 
 Tags: `:{{ release.version }}` for a release, `:latest` for the newest release, `:main` for the newest build of `main` (see [Releases and support](releases.md#image-tags)).
 
-The operator registers two EEs for it, `AWX EE (latest)` and `AWX EE (<version>)`, and uses it as the Control Plane Execution Environment (for project updates and inventory syncs).
+The operator registers two EEs for it, and uses `belfry-ee:<version>` as the Control Plane Execution Environment (for project updates and inventory syncs):
+
+- `AWX EE (<version>)`, e.g. `AWX EE ({{ release.version }})`: `belfry-ee:<version>`, the EE released with your Belfry version. Select it for reproducible jobs.
+- `AWX EE (latest)`: `{{ release.latest_ee_image }}`, a rolling image, like AWX's `awx-ee:latest`. It is updated without a Belfry release, so it can change under your jobs.
 
 ## Building your own
 
