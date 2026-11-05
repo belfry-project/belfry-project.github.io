@@ -106,6 +106,23 @@ changes:
       released by the AWX project.
 
   - category: fixes
+    title: Receptor and the operator base image rebuilt with security fixes
+    description: >-
+      AWX ships the receptor binary and builds the operator on the ansible-operator
+      image as released upstream, with an old Go toolchain, vulnerable Go modules and
+      outdated Python and operating system packages. Belfry rebuilds both from the same
+      upstream releases with current Go, Go modules, UBI packages and Python packages,
+      and rebuilds them every week. This removes all high and critical findings in
+      receptor (in the execution environment and the Belfry image) and in the
+      ansible-operator binary and Python packages of the operator image, including a
+      critical one in certifi.
+    links:
+      - belfry-project/image-mirror#2
+      - belfry-project/belfry-ee#15
+      - belfry-project/belfry#33
+      - belfry-project/belfry-operator#21
+
+  - category: fixes
     title: The operator can be installed as published
     description: >-
       awx-operator 2.19.1, the last AWX operator release, can no longer be installed as
