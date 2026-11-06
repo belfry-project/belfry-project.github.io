@@ -59,7 +59,6 @@ changes:
 
   - category: support
     title: AlmaLinux 10 and Python 3.14 for the application and execution environment
-    unreleased: true
     description: >-
       AWX 24.6.1 builds its application image, execution environment and the operator's
       init-projects container on CentOS Stream 9, which reaches end of life in May 2027,
@@ -81,7 +80,6 @@ changes:
 
   - category: support
     title: PostgreSQL 18 for the managed database
-    unreleased: true
     description: >-
       awx-operator 2.19.1 and belfry-operator 1.0.0 run the managed database on
       PostgreSQL 15, which gets fixes until November 2027. belfry-operator moves it to

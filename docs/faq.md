@@ -30,7 +30,7 @@ In different namespaces, yes. Both operators manage the same resource kinds, so 
 
 ## Why AlmaLinux 10 and not CentOS? { #why-almalinux }
 
-From the release after {{ release.version }}, the Belfry application image, belfry-ee and the operator's init-projects container are built on [AlmaLinux 10](https://almalinux.org/), and Belfry runs on Python 3.14. {{ release.version }} still uses CentOS Stream 9 for the application and CentOS Stream 10 for belfry-ee, as AWX did with CentOS Stream 9.
+Since 1.1.0, the Belfry application image, belfry-ee and the operator's init-projects container are built on [AlmaLinux 10](https://almalinux.org/), and Belfry runs on Python 3.14. Belfry 1.0.0 used CentOS Stream 9 for the application and the init-projects container, CentOS Stream 10 for belfry-ee, and Python 3.12; AWX uses CentOS Stream 9.
 
 - **Stable instead of rolling.** CentOS Stream is the preview of the next RHEL minor release: packages land there before RHEL has released them, and there are no point releases to pin or test against. AlmaLinux 10 is a free rebuild of RHEL 10, with point releases and security errata.
 - **Longer support.** AlmaLinux 10 is supported until May 2035. CentOS Stream 9, which AWX uses, ends in May 2027, and CentOS Stream 10 around May 2030.

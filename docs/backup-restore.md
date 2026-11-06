@@ -58,7 +58,7 @@ kubectl -n awx delete secret --ignore-not-found awx-admin-password awx-secret-ke
 kubectl -n awx delete pvc --ignore-not-found postgres-15-awx-postgres-15-0 postgres-18-awx-postgres-18-0
 ```
 
-The PVC is `postgres-15-...` in {{ release.version }} and `postgres-18-...` from the next release, which moves the managed database to [PostgreSQL 18](upgrade.md#postgresql-18). A backup made from PostgreSQL 15 restores into PostgreSQL 18.
+The PVC is `postgres-18-...` since 1.1.0, which moved the managed database to [PostgreSQL 18](upgrade.md#postgresql-18). Instances from belfry-operator 1.0.0 or awx-operator used `postgres-15-...`, which the move keeps. A backup made from PostgreSQL 15 restores into PostgreSQL 18.
 
 ```yaml title="awxrestore.yaml"
 apiVersion: awx.ansible.com/v1beta1
