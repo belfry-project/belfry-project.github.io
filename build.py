@@ -39,6 +39,11 @@ BELFRY_REPOS = {
 
 # Python version of the base image, used when the execution environment does not set one
 SYSTEM_PYTHON = {'9': '3.9', '10': '3.12'}
+# Base images, matched as "<image>:<tag>", with the name of the distribution and its endoflife.date product
+BASE_IMAGES = [
+    (r'quay\.io/centos/centos:stream(\d+)', 'CentOS Stream', 'centos-stream'),
+    (r'quay\.io/almalinuxorg/almalinux:(\d+)', 'AlmaLinux', 'almalinux'),
+]
 
 TODAY = datetime.datetime.now(datetime.UTC).date()
 
@@ -88,10 +93,22 @@ def search(pattern, text, what):
 # Extractors: each returns the version string for one side (upstream or Belfry)
 
 
+def base_os(text, prefix=''):
+    """Return (distribution and major version, e.g. 'AlmaLinux 10', major version) of the first base image after prefix."""
+    for pattern, name, _product in BASE_IMAGES:
+        match = re.search(prefix + pattern, text, re.MULTILINE)
+        if match:
+            return f'{name} {match.group(1)}', match.group(1)
+    raise ValueError(f'Could not find the base image (prefix {prefix!r})')
+
+
+def os_product(version):
+    """endoflife.date product for a base_os() name."""
+    return next(product for _pattern, name, product in BASE_IMAGES if version.startswith(name + ' '))
+
+
 def app_base_os(refs):
-    return 'CentOS Stream ' + search(
-        r'^FROM quay\.io/centos/centos:stream(\d+)', source('app', refs, 'tools/ansible/roles/dockerfile/templates/Dockerfile.j2'), 'base image'
-    )
+    return base_os(source('app', refs, 'tools/ansible/roles/dockerfile/templates/Dockerfile.j2'), '^FROM ')[0]
 
 
 def app_python(refs):
@@ -100,7 +117,7 @@ def app_python(refs):
 
 def app_node(refs):
     dockerfile = source('app', refs, 'tools/ansible/roles/dockerfile/templates/Dockerfile.j2')
-    if 'nodejs:{{ nodejs_version }}' in dockerfile:
+    if 'nodejs:{{ nodejs_version }}' in dockerfile or 'nodejs{{ nodejs_version }}' in dockerfile:
         return source('app', refs, '.nvmrc').strip()
     match = re.search(r'\bn (\d+)\.\d+\.\d+', dockerfile) or re.search(r'nodejs:(\d+)', dockerfile)
     if not match:
@@ -118,7 +135,7 @@ def app_receptor(refs):
 
 
 def ee_base_os(refs):
-    return 'CentOS Stream ' + search(r'name: quay\.io/centos/centos:stream(\d+)', source('ee', refs, 'execution-environment.yml'), 'base image')
+    return base_os(source('ee', refs, 'execution-environment.yml'), 'name: ')[0]
 
 
 def ee_python(refs):
@@ -126,8 +143,7 @@ def ee_python(refs):
     match = re.search(r'python_path: /usr/bin/python(3\.\d+)', spec)
     if match:
         return match.group(1)
-    stream = search(r'name: quay\.io/centos/centos:stream(\d+)', spec, 'base image')
-    return f'{SYSTEM_PYTHON[stream]} (system default)'
+    return f'{SYSTEM_PYTHON[base_os(spec, "name: ")[1]]} (system default)'
 
 
 def ee_ansible_core(refs):
@@ -161,24 +177,29 @@ def operator_redis(refs):
     return search(r'^_redis_image_version: "?([\w.]+)"?', source('operator', refs, 'roles/installer/defaults/main.yml'), 'Redis version')
 
 
+def operator_init_os(refs):
+    return base_os(source('operator', refs, 'roles/installer/defaults/main.yml'), '^_init_projects_container_image: ')[0]
+
+
 def operator_postgres(refs):
     return search(r'^_postgres_image: \S*postgresql-(\d+)-', source('operator', refs, 'roles/installer/defaults/main.yml'), 'PostgreSQL version')
 
 
 # Rows of the comparison table: (group, component, extractor, endoflife.date product)
 ROWS = [
-    ('Belfry / AWX application', 'Base operating system', app_base_os, 'centos-stream'),
+    ('Belfry / AWX application', 'Base operating system', app_base_os, 'os'),
     ('Belfry / AWX application', 'Python', app_python, 'python'),
     ('Belfry / AWX application', 'Node.js (UI build)', app_node, 'nodejs'),
     ('Belfry / AWX application', 'Django', app_django, 'django'),
     ('Belfry / AWX application', 'Receptor', app_receptor, None),
-    ('Execution environment', 'Base operating system', ee_base_os, 'centos-stream'),
+    ('Execution environment', 'Base operating system', ee_base_os, 'os'),
     ('Execution environment', 'Python', ee_python, 'python'),
     ('Execution environment', 'ansible-core', ee_ansible_core, 'ansible-core'),
     ('Kubernetes operator', 'ansible-operator base image', operator_base, None),
     ('Kubernetes operator', 'kubernetes.core collection', operator_kubernetes_core, None),
     ('Kubernetes operator', 'Redis (default)', operator_redis, 'redis'),
     ('Kubernetes operator', 'PostgreSQL (default)', operator_postgres, 'postgresql'),
+    ('Kubernetes operator', 'init-projects container image', operator_init_os, 'os'),
 ]
 
 _eol_cache = {}
@@ -188,10 +209,12 @@ def support_status(product, version):
     """Return (state, text), where state is 'ok', 'soon', 'eol' or 'unknown'."""
     if not product:
         return 'unknown', ''
+    if product == 'os':
+        product = os_product(version)
     if product not in _eol_cache:
         _eol_cache[product] = json.loads(fetch(f'https://endoflife.date/api/{product}.json'))
     cycles = _eol_cache[product]
-    number = re.match(r'[\d.]+', version.replace('CentOS Stream ', ''))
+    number = re.match(r'[\d.]+', re.sub(r'^(CentOS Stream|AlmaLinux) ', '', version))
     if not number:
         return 'unknown', ''
     number = number.group(0).rstrip('.')
@@ -324,7 +347,13 @@ def render():
                 + [f'<a href="{html.escape(u["url"])}">{html.escape(u["title"])}</a>' for u in change.get('urls', [])]
             )
             links_html = f'<p class="links">{links}</p>' if links else ''
-            entries.append(f'<li><h4>{html.escape(change["title"])}</h4><p>{html.escape(change["description"])}</p>{links_html}</li>')
+            # Merged on main but not in the release the table compares; remove the flag when it is released
+            pending = (
+                f' <span class="badge soon">Not in {html.escape(BELFRY_LABEL)}: on main, in the next release</span>'
+                if change.get('unreleased') and BELFRY_REF != 'main'
+                else ''
+            )
+            entries.append(f'<li><h4>{html.escape(change["title"])}{pending}</h4><p>{html.escape(change["description"])}</p>{links_html}</li>')
         sections.append(f'<section><h3>{html.escape(category["title"])}</h3><ul class="changes">{"".join(entries)}</ul></section>')
 
     upstream_commits, belfry_commits, belfry_pulls, belfry_repos = belfry_activity()

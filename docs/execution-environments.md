@@ -6,7 +6,7 @@ Jobs run in an execution environment (EE): a container image with ansible-core, 
 
 | | AWX EE {{ awx.version }} | belfry-ee |
 |---|---|---|
-| Base image | CentOS Stream 9 | CentOS Stream 10 |
+| Base image | CentOS Stream 9 | AlmaLinux 10 from the next release ({{ release.version }}: CentOS Stream 10), see [why](faq.md#why-almalinux) |
 | Python | 3.9 | 3.14 (`/usr/bin/python3.14`) |
 | ansible-core | {{ awx.ansible_core }} | {{ release.ansible_core }} |
 | Architectures | amd64, arm64 | amd64, arm64 |
@@ -31,7 +31,7 @@ images:
     name: ghcr.io/belfry-project/belfry-ee:{{ release.version }}
 dependencies:
   # belfry-ee uses Python 3.14, which is not the default python3 of
-  # CentOS Stream 10. Without this, Python packages would be installed
+  # AlmaLinux 10 (or CentOS Stream 10 in {{ release.version }}). Without this, Python packages would be installed
   # for the wrong Python.
   python_interpreter:
     python_path: /usr/bin/python3.14

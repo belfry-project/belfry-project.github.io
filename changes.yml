@@ -58,6 +58,28 @@ changes:
         url: https://github.com/belfry-project/belfry-operator/actions/workflows/upgrade-test.yml
 
   - category: support
+    title: AlmaLinux 10 and Python 3.14 for the application and execution environment
+    unreleased: true
+    description: >-
+      AWX 24.6.1 builds its application image, execution environment and the operator's
+      init-projects container on CentOS Stream 9, which reaches end of life in May 2027,
+      and runs the application on Python 3.11. Belfry moves all three images to
+      AlmaLinux 10, supported until May 2035, and the application to Python 3.14,
+      supported until October 2030. CentOS Stream is a rolling preview of the next RHEL
+      release, so its packages change before RHEL has released them, and it has no
+      point releases to test against; AlmaLinux 10 is a free, stable rebuild of RHEL 10
+      with point releases and security errata. It uses the same packages as RHEL, so
+      teams that know RHEL or CentOS know it too, and execution environments built on
+      belfry-ee install packages with dnf as before.
+    links:
+      - belfry-project/belfry#36
+      - belfry-project/belfry-ee#16
+      - belfry-project/belfry-operator#29
+    urls:
+      - title: Why AlmaLinux 10
+        url: https://belfry-project.github.io/docs/faq/#why-almalinux
+
+  - category: support
     title: Django REST framework 3.18
     description: >-
       AWX 24.6.1 uses Django REST framework 3.15.1, and the AWX development branch is
