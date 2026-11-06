@@ -80,6 +80,25 @@ changes:
         url: https://belfry-project.github.io/docs/faq/#why-almalinux
 
   - category: support
+    title: PostgreSQL 18 for the managed database
+    unreleased: true
+    description: >-
+      awx-operator 2.19.1 and belfry-operator 1.0.0 run the managed database on
+      PostgreSQL 15, which gets fixes until November 2027. belfry-operator moves it to
+      PostgreSQL 18, supported until November 2030. On the first reconciliation after
+      the operator upgrade, it copies the data into a new PostgreSQL 18 database with
+      pg_dump and pg_restore, on a second volume of the same size, while Belfry is scaled
+      down; the old volume is kept until you delete it. External databases are not
+      touched. An automated test upgrades AWX 24.6.1 and belfry-operator 1.0.0
+      installations this way, and restores PostgreSQL 15 and 18 backups into PostgreSQL 18.
+    links:
+      - belfry-project/belfry-operator#30
+      - belfry-project/belfry#37
+    urls:
+      - title: Upgrading to PostgreSQL 18
+        url: https://belfry-project.github.io/docs/upgrade/#postgresql-18
+
+  - category: support
     title: Django REST framework 3.18
     description: >-
       AWX 24.6.1 uses Django REST framework 3.15.1, and the AWX development branch is

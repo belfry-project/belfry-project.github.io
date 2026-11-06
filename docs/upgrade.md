@@ -53,6 +53,38 @@ kubectl -n awx get awx -o custom-columns=NAME:.metadata.name,VERSION:.status.ver
 
 The operator runs the database migrations in a Job (`<name>-migration-<hash>`) before it rolls out the new web and task pods.
 
+## PostgreSQL 18 { #postgresql-18 }
+
+belfry-operator {{ release.version }}, like awx-operator {{ awx.operator_version }}, runs the managed database on PostgreSQL 15 (`quay.io/sclorg/postgresql-15-c9s`). From the next release, it runs it on **PostgreSQL 18** (`quay.io/sclorg/postgresql-18-c10s`). PostgreSQL 15 gets fixes until November 2027, PostgreSQL 18 until November 2030, so the move gives Belfry three more years on a supported database, and the newer planner and I/O improvements.
+
+The operator migrates each instance once, during its first reconciliation after the operator upgrade, the same way awx-operator moved from PostgreSQL 13 to 15:
+
+1. It scales down the web and task deployments. **Belfry is unavailable until the migration is done**, which takes about as long as a dump and restore of your database.
+2. It creates the StatefulSet `<name>-postgres-18` with a **new PVC** `postgres-18-<name>-postgres-18-0`, of the size and storage class in your `AWX` resource (`postgres_storage_requirements`, `postgres_storage_class`).
+3. It copies the data from the old database with `pg_dump` and `pg_restore`, and points `<name>-postgres-configuration` to the new database.
+4. It removes the old StatefulSet, Service and NetworkPolicy (`<name>-postgres-15`), sets `status.upgradedPostgresVersion` to `18`, and starts Belfry again.
+
+What you need to do:
+
+- [Take a backup](backup-restore.md#taking-a-backup) first, as for every upgrade.
+- Make sure the cluster can provision **a second database volume of the same size**. The old PVC `postgres-15-<name>-postgres-15-0` is kept, so you can go back to it; delete it when the new version works:
+
+    ```bash
+    kubectl -n awx delete pvc postgres-15-awx-postgres-15-0
+    ```
+
+- If your `AWX` resource sets `postgres_image` or `postgres_image_version`, remove them (or point them to a PostgreSQL 18 image) before upgrading. Otherwise the operator migrates into your PostgreSQL 15 image.
+- **External databases** (a `postgres_configuration_secret` of type `unmanaged`) are not touched. Upgrade them when it suits you; Belfry needs PostgreSQL 12 or newer, and is tested with PostgreSQL 18.
+
+Check the result:
+
+```bash
+kubectl -n awx get awx awx -o jsonpath='{.status.upgradedPostgresVersion}{"\n"}'
+kubectl -n awx exec awx-postgres-18-0 -- psql -tAc 'SHOW server_version'
+```
+
+Backups made from PostgreSQL 15, by belfry-operator {{ release.version }} or by awx-operator, restore into a PostgreSQL 18 database. The [upgrade test](migrate.md#what-the-upgrade-test-covers) checks the migration from AWX {{ awx.version }} and from belfry-operator {{ release.version }}, and backups and restores on both versions.
+
 ## Upgrading instances one at a time
 
 With `auto_upgrade: false` in an `AWX` resource, the operator leaves a running instance alone. To upgrade it later, set `auto_upgrade: true`, wait for the upgrade, and set it back. See [auto upgrade](https://belfry-project.github.io/docs/operator/user-guide/advanced-configuration/auto-upgrade.html) in the operator reference.

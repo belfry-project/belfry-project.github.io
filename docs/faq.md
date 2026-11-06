@@ -39,6 +39,8 @@ From the release after {{ release.version }}, the Belfry application image, belf
 
 We also considered Rocky Linux 10 (technically equivalent), Red Hat UBI 10 (its free repositories lack packages Belfry needs to build), Debian or Ubuntu (a rewrite of the images without a gain for users), and minimal images such as Alpine (no rsyslog or nginx, and Python packages built for glibc do not work). The decision is recorded in [DECISIONS.md](https://github.com/belfry-project/.github/blob/main/DECISIONS.md).
 
+The PostgreSQL image of the managed database is not Belfry's own: it is `quay.io/sclorg/postgresql-18-c10s` from the Software Collections project, built on CentOS Stream 10, like the PostgreSQL 15 image before it. There is no AlmaLinux PostgreSQL image with the same layout, and the operator's database migration depends on that layout. The image runs only PostgreSQL, from the same packages RHEL 10 ships. See [PostgreSQL 18](upgrade.md#postgresql-18).
+
 Python 3.14 is the newest Python in AlmaLinux 10, supported upstream until October 2030; AWX {{ awx.version }} runs on Python 3.11.
 
 ## Which UI does Belfry use?
