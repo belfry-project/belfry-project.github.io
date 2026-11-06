@@ -43,9 +43,8 @@ extra:
     helm_chart: belfry-operator
     chart_version: "1.0.0"
     # The image of the managed execution environment "AWX EE (latest)" that
-    # the operator registers (belfry-project/belfry-operator#19: the newest
-    # build of main, like AWX's rolling awx-ee:latest).
-    latest_ee_image: ghcr.io/belfry-project/belfry-ee:main
+    # the operator registers: the EE of the same release (DECISIONS.md, 2026-11-06).
+    latest_ee_image: ghcr.io/belfry-project/belfry-ee:1.0.0
     # The ansible-core minor version in belfry-ee.
     ansible_core: "2.22"
   # The last AWX release, which the migration guide starts from.

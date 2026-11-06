@@ -188,7 +188,7 @@ The operator reconciles your `AWX` resource within a minute. What happens:
 
 1. The web and task deployments get the Belfry image `ghcr.io/belfry-project/belfry:{{ release.version }}`, the Redis 8 sidecar (`docker.io/redis:8.x`, instead of Redis 7) and init containers from `belfry-ee`. Redis only holds transient data (the websocket and dispatcher queues), so nothing needs to be migrated there.
 2. A Job `awx-migration-<hash>` runs the database migrations from AWX {{ awx.version }} to Belfry on the existing PostgreSQL 15 database. PostgreSQL itself is not changed.
-3. The task pod registers the managed execution environments: `AWX EE (latest)` now points to `{{ release.latest_ee_image }}`, `AWX EE ({{ release.version }})` (`belfry-ee:{{ release.version }}`) is added, and the Control Plane Execution Environment uses `belfry-ee:{{ release.version }}`. See [step 7](#7-update-execution-environments-and-playbooks) for `AWX EE ({{ awx.version }})`.
+3. The task pod registers the managed execution environments: `AWX EE (latest)` now points to `{{ release.latest_ee_image }}`, the EE of this release, `AWX EE ({{ release.version }})` (the same image) is added, and the Control Plane Execution Environment uses `belfry-ee:{{ release.version }}`. See [step 7](#7-update-execution-environments-and-playbooks) for `AWX EE ({{ awx.version }})`.
 4. The `AWX` resource status gets the new `version`, and `upgradedFrom: {{ awx.version }}`.
 
 Follow it:

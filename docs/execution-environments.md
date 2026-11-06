@@ -18,7 +18,7 @@ Tags: `:{{ release.version }}` for a release, `:latest` for the newest release, 
 The operator registers two EEs for it, and uses `belfry-ee:<version>` as the Control Plane Execution Environment (for project updates and inventory syncs):
 
 - `AWX EE (<version>)`, e.g. `AWX EE ({{ release.version }})`: `belfry-ee:<version>`, the EE released with your Belfry version. Select it for reproducible jobs.
-- `AWX EE (latest)`: `{{ release.latest_ee_image }}`, a rolling image, like AWX's `awx-ee:latest`. It is updated without a Belfry release, so it can change under your jobs.
+- `AWX EE (latest)`: `{{ release.latest_ee_image }}`, the EE of the installed Belfry release. Unlike AWX's rolling `awx-ee:latest`, it only changes when you upgrade Belfry. The name stays, so job templates that use it keep working.
 
 ## Building your own
 
