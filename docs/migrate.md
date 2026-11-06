@@ -149,7 +149,7 @@ Install belfry-operator **over** awx-operator, in the same namespace. It uses th
 
 === "Helm"
 
-    **Not covered by the upgrade test.** If you installed awx-operator with the [awx-operator-helm](https://github.com/ansible-community/awx-operator-helm) chart, switch the same release to the Belfry chart. The chart uses the same values (`AWX.enabled`, `AWX.name`, `AWX.spec`, ...), so keep your values file, after [checking it](#3-check-your-awx-resource) for pinned images.
+    Tested in CI: the helm-charts repository installs awx-operator-helm 2.19.1 and runs exactly these steps. If you installed awx-operator with the [awx-operator-helm](https://github.com/ansible-community/awx-operator-helm) chart, switch the same release to the Belfry chart. The chart uses the same values (`AWX.enabled`, `AWX.name`, `AWX.spec`, ...), so keep your values file, after [checking it](#3-check-your-awx-resource) for pinned images.
 
     Helm does not update CRDs, so apply the Belfry CRDs first:
 
@@ -158,12 +158,11 @@ Install belfry-operator **over** awx-operator, in the same namespace. It uses th
       -k "https://github.com/belfry-project/belfry-operator/config/crd?ref={{ release.version }}"
     ```
 
-    The label selector of the operator deployment differs between the two charts (`helm.sh/chart: awx-operator` and `belfry-operator`), and selectors cannot be changed, so delete the old operator deployment before the upgrade. This does not touch your AWX instance:
+    Then upgrade the release to the Belfry chart. The chart keeps the label selector of awx-operator-helm, so the operator deployment is updated in place:
 
     ```bash
     helm repo add {{ release.helm_repo_name }} {{ release.helm_repo }}
     helm repo update
-    kubectl -n awx delete deployment awx-operator-controller-manager
     helm upgrade my-awx-operator {{ release.helm_repo_name }}/{{ release.helm_chart }} \
       --namespace awx --version {{ release.chart_version }} -f myvalues.yaml
     kubectl -n awx rollout status deployment/awx-operator-controller-manager --timeout=10m
