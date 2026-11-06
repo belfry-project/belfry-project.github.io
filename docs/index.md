@@ -18,7 +18,7 @@ Upstream AWX releases have been paused since AWX 24.6.1 and awx-operator 2.19.1,
 Belfry continues from AWX's development branch as of November 2026, with all its unreleased fixes, and adds:
 
 - releases with [semantic versioning](releases.md), starting at **{{ release.version }}**;
-- current, supported components: Python, Django, ansible-core {{ release.ansible_core }}, Redis 8 and, from the next release, [AlmaLinux 10](faq.md#why-almalinux) as the base of every image;
+- current, supported components: Python, Django, ansible-core {{ release.ansible_core }}, Redis 8 and, from the next release, [AlmaLinux 10](faq.md#why-almalinux) as the base of every Belfry image;
 - images built and published entirely on GitHub, for amd64 and arm64, with [build provenance and SBOMs](verify-images.md), and a daily scan for known vulnerabilities;
 - a [tested migration path](migrate.md) from AWX {{ awx.version }}.
 
@@ -36,7 +36,7 @@ Belfry keeps AWX's interfaces, so existing automation, scripts and Kubernetes re
 | Kubernetes resources | Kinds `AWX`, `AWXBackup`, `AWXRestore` and `AWXMeshIngress`, API group `awx.ansible.com`, version `v1beta1` |
 | Operator objects | Namespace and names such as `awx-operator-controller-manager`, the `<name>-web` and `<name>-task` deployments, `<name>-admin-password` and the other secrets |
 | Managed execution environment | Still called `AWX EE (latest)`, now pointing to `ghcr.io/belfry-project/belfry-ee` |
-| Database | PostgreSQL 15, migrated in place by the usual Django migrations |
+| Database | PostgreSQL 15 in {{ release.version }}, migrated in place by the usual Django migrations. From the next release, the operator moves its managed database to [PostgreSQL 18](upgrade.md#postgresql-18) |
 
 ## What is different
 
