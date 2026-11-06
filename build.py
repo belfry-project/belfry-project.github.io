@@ -12,6 +12,7 @@ import html
 import json
 import os
 import re
+import urllib.error
 import urllib.request
 
 import yaml
@@ -22,11 +23,6 @@ UPSTREAM = {
     'app': ('ansible/awx', '24.6.1'),
     'ee': ('ansible/awx-ee', '00fe06c671'),
     'operator': ('ansible/awx-operator', '2.19.1'),
-}
-BELFRY = {
-    'app': ('belfry-project/belfry', 'main'),
-    'ee': ('belfry-project/belfry-ee', 'main'),
-    'operator': ('belfry-project/belfry-operator', 'main'),
 }
 # Upstream commit that Belfry was created from; update after an upstream sync.
 BELFRY_UPSTREAM_BASE = 'a498310675'
@@ -55,6 +51,26 @@ def fetch(url, accept=None):
         headers['Authorization'] = f'Bearer {os.environ["GITHUB_TOKEN"]}'
     with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=30) as response:
         return response.read().decode()
+
+
+def latest_release():
+    """Tag of the latest final Belfry release, or 'main' if there is none yet."""
+    try:
+        return json.loads(fetch('https://api.github.com/repos/belfry-project/belfry/releases/latest'))['tag_name']
+    except urllib.error.HTTPError as e:
+        if e.code == 404:  # no release yet
+            return 'main'
+        raise
+
+
+# belfry, belfry-ee and belfry-operator are released together with the same tag
+BELFRY_REF = os.environ.get('BELFRY_REF') or latest_release()
+BELFRY_LABEL = 'Belfry (main)' if BELFRY_REF == 'main' else f'Belfry {BELFRY_REF}'
+BELFRY = {
+    'app': ('belfry-project/belfry', BELFRY_REF),
+    'ee': ('belfry-project/belfry-ee', BELFRY_REF),
+    'operator': ('belfry-project/belfry-operator', BELFRY_REF),
+}
 
 
 def source(component, ref_map, path):
@@ -126,7 +142,11 @@ def ee_ansible_core(refs):
 
 
 def operator_base(refs):
-    return search(r'^FROM (?:quay\.io/operator-framework|ghcr\.io/belfry-project)/ansible-operator:(v[\d.]+)', source('operator', refs, 'Dockerfile'), 'ansible-operator base image')
+    return search(
+        r'^FROM (?:quay\.io/operator-framework|ghcr\.io/belfry-project)/ansible-operator:(v[\d.]+)',
+        source('operator', refs, 'Dockerfile'),
+        'ansible-operator base image',
+    )
 
 
 def operator_kubernetes_core(refs):
@@ -259,7 +279,7 @@ def vulnerability_section():
     section = f"""<h2 id="vulnerabilities">Known vulnerabilities</h2>
   <div class="table-wrap">
     <table>
-      <thead><tr><th scope="col">Image</th><th scope="col">AWX 24.6.1</th><th scope="col">Belfry (main)</th></tr></thead>
+      <thead><tr><th scope="col">Image</th><th scope="col">AWX 24.6.1</th><th scope="col">{BELFRY_LABEL}</th></tr></thead>
       <tbody>
 {chr(10).join(rows)}
       </tbody>
@@ -329,6 +349,7 @@ def render():
         .replace('{{ belfry_pulls }}', f'{belfry_pulls:,}')
         .replace('{{ belfry_repos }}', str(belfry_repos))
         .replace('{{ generated }}', f'{TODAY:%d %B %Y}')
+        .replace('{{ belfry_label }}', BELFRY_LABEL)
     )
 
 

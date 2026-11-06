@@ -12,9 +12,9 @@ import subprocess
 
 # (component, AWX image as released, Belfry image)
 IMAGES = [
-    ('Application', 'quay.io/ansible/awx:24.6.1', 'ghcr.io/belfry-project/belfry:main'),
+    ('Application', 'quay.io/ansible/awx:24.6.1', 'ghcr.io/belfry-project/belfry:latest'),
     ('Execution environment', 'quay.io/ansible/awx-ee:24.6.1', 'ghcr.io/belfry-project/belfry-ee:latest'),
-    ('Kubernetes operator', 'quay.io/ansible/awx-operator:2.19.1', 'ghcr.io/belfry-project/belfry-operator:main'),
+    ('Kubernetes operator', 'quay.io/ansible/awx-operator:2.19.1', 'ghcr.io/belfry-project/belfry-operator:latest'),
 ]
 SEVERITIES = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']
 TRIVY = os.environ.get('TRIVY', 'trivy')
