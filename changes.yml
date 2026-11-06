@@ -160,6 +160,28 @@ changes:
       - belfry-project/helm-charts#5
 
   - category: build
+    title: Releases on GitHub with matching versions, images, chart and packages
+    description: >-
+      Each Belfry release has the same version tag (for example 1.0.0, or 1.0.0-rc.1
+      for a release candidate) for the application, execution environment, operator
+      and Helm chart, and the operator installs the matching application and
+      execution environment by default. The application reports exactly that version.
+      Each release comes with an operator install manifest, the Helm chart in the
+      repository https://belfry-project.github.io/helm-charts/, the awx.awx collection
+      and awxkit as downloads, and for every image an SBOM and a vulnerability scan.
+      ":latest" means the newest final release; release candidates never get it.
+    links:
+      - belfry-project/belfry#31
+      - belfry-project/belfry#34
+      - belfry-project/belfry-ee#14
+      - belfry-project/belfry-operator#28
+      - belfry-project/helm-charts#9
+      - belfry-project/helm-charts#11
+    urls:
+      - title: Release procedure
+        url: https://github.com/belfry-project/.github/blob/main/RELEASING.md
+
+  - category: build
     title: All dependencies pinned, and updated through reviewed pull requests
     description: >-
       AWX builds install several dependencies from moving branches, so the same release
