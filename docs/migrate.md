@@ -58,7 +58,9 @@ namespace: awx
 
 Belfry's operator no longer uses kube-rbac-proxy: the metrics endpoint does its own authentication.
 
-**Image access.** The nodes must be able to pull `ghcr.io/belfry-project/belfry`, `belfry-ee` and `belfry-operator`, and `docker.io/redis:8`. For a mirror, see [Execution environments](execution-environments.md#private-registries) and the image fields in the [operator reference](https://belfry-project.github.io/docs/operator/user-guide/advanced-configuration/deploying-a-specific-version-of-awx.html).
+**Image access.** The nodes must be able to pull `ghcr.io/belfry-project/belfry`, `belfry-ee` and `belfry-operator`, `docker.io/redis:8` and `quay.io/sclorg/postgresql-18-c10s`. For a mirror, see [Execution environments](execution-environments.md#private-registries) and the image fields in the [operator reference](https://belfry-project.github.io/docs/operator/user-guide/advanced-configuration/deploying-a-specific-version-of-awx.html).
+
+**Storage and downtime.** During the switch, the operator also moves the managed database from PostgreSQL 15 to [PostgreSQL 18](upgrade.md#postgresql-18). The cluster must be able to provision **a second database volume of the same size** as the current one; the old PVC `postgres-15-awx-postgres-15-0` is kept until you delete it. Belfry is unavailable while the data is copied and migrated. External (unmanaged) databases are not touched.
 
 ## 2. Take a backup
 
@@ -94,6 +96,7 @@ kubectl -n awx get awx awx -o yaml | grep -nE 'image|ee_images|auto_upgrade'
 - **`image` / `image_version`**: if they point to `quay.io/ansible/awx`, remove both (the operator then deploys the Belfry version it was released with), or set them to `ghcr.io/belfry-project/belfry` and `{{ release.version }}`. Both must be set together, or neither; belfry-operator validates this.
 - **`ee_images`, `control_plane_ee_image`, `init_container_image`**: if they point to `quay.io/ansible/awx-ee`, remove them or point them to `ghcr.io/belfry-project/belfry-ee:{{ release.version }}` (or your own EE built on it, see [Execution environments](execution-environments.md)).
 - **`redis_image` / `redis_image_version`**: remove them to get Redis 8, or keep your own.
+- **`postgres_image` / `postgres_image_version`**: remove them (or point them to a PostgreSQL 18 image). Otherwise the operator migrates into your PostgreSQL 15 image.
 - **`auto_upgrade: false`**: the operator then does not touch a running instance. Set it to `true` for the migration.
 
 To remove a field:
@@ -187,9 +190,10 @@ It should show one container, `awx-manager: ghcr.io/belfry-project/belfry-operat
 The operator reconciles your `AWX` resource within a minute. What happens:
 
 1. The web and task deployments get the Belfry image `ghcr.io/belfry-project/belfry:{{ release.version }}`, the Redis 8 sidecar (`docker.io/redis:8.x`, instead of Redis 7) and init containers from `belfry-ee`. Redis only holds transient data (the websocket and dispatcher queues), so nothing needs to be migrated there.
-2. A Job `awx-migration-<hash>` runs the database migrations from AWX {{ awx.version }} to Belfry on the existing PostgreSQL 15 database. PostgreSQL itself is not changed by belfry-operator {{ release.version }}; from the next release, the operator first moves the managed database to [PostgreSQL 18](upgrade.md#postgresql-18), in a new volume, before the migration Job runs.
-3. The task pod registers the managed execution environments: `AWX EE (latest)` now points to `{{ release.latest_ee_image }}`, the EE of this release, `AWX EE ({{ release.version }})` (the same image) is added, and the Control Plane Execution Environment uses `belfry-ee:{{ release.version }}`. See [step 7](#7-update-execution-environments-and-playbooks) for `AWX EE ({{ awx.version }})`.
-4. The `AWX` resource status gets the new `version`, and `upgradedFrom: {{ awx.version }}`.
+2. The operator moves the managed database from PostgreSQL 15 to [PostgreSQL 18](upgrade.md#postgresql-18): with the web and task deployments scaled down, it copies the data with `pg_dump` and `pg_restore` into the new StatefulSet `awx-postgres-18`, on a **second PVC of the same size** (`postgres-18-awx-postgres-18-0`), and removes the PostgreSQL 15 StatefulSet. The old PVC `postgres-15-awx-postgres-15-0` is kept; delete it once Belfry works. External databases are not touched.
+3. A Job `awx-migration-<hash>` runs the database migrations from AWX {{ awx.version }} to Belfry on the PostgreSQL 18 database.
+4. The task pod registers the managed execution environments: `AWX EE (latest)` now points to `{{ release.latest_ee_image }}`, the EE of this release, `AWX EE ({{ release.version }})` (the same image) is added, and the Control Plane Execution Environment uses `belfry-ee:{{ release.version }}`. See [step 7](#7-update-execution-environments-and-playbooks) for `AWX EE ({{ awx.version }})`.
+5. The `AWX` resource status gets the new `version`, `upgradedFrom: {{ awx.version }}` and `upgradedPostgresVersion: 18`.
 
 Follow it:
 
@@ -212,7 +216,7 @@ The operator log shows a summary at the end of every reconcile (`failed=0` means
 ## 6. Verify
 
 ```bash
-kubectl -n awx get awx awx -o jsonpath='version={.status.version} upgradedFrom={.status.upgradedFrom}{"\n"}'
+kubectl -n awx get awx awx -o jsonpath='version={.status.version} upgradedFrom={.status.upgradedFrom} postgres={.status.upgradedPostgresVersion}{"\n"}'
 curl -s https://awx.example.com/api/v2/ping/ | python3 -m json.tool
 ```
 
@@ -309,11 +313,11 @@ The workflow [`upgrade-test.yml`](https://github.com/belfry-project/belfry-opera
 3. backs it up with an `AWXBackup`;
 4. applies belfry-operator's `config/default` over awx-operator (`make deploy`) and waits until the web and task deployments run the Belfry image;
 5. checks that the version changed, that all objects, the old job with its output and the cached facts survived, and that a new job runs in `belfry-ee`, decrypts the old credential and updates the facts;
-6. from the next release: checks that the operator moved the database to PostgreSQL 18 and removed the PostgreSQL 15 StatefulSet, and backs up the upgraded instance;
-7. deletes that instance and its kept secrets and PostgreSQL volumes, restores the {{ awx.version }} backup with belfry-operator into a new instance with an `AWXRestore`, checks that the operator ran a migration Job for it (and, from the next release, that it runs on PostgreSQL 18), and verifies the same data and a new job there;
-8. from the next release: restores the PostgreSQL 18 backup of the upgraded instance into a third instance and verifies the data there.
+6. checks that the operator moved the database to PostgreSQL 18 and removed the PostgreSQL 15 StatefulSet, and backs up the upgraded instance;
+7. deletes that instance and its kept secrets and PostgreSQL volumes, restores the {{ awx.version }} backup with belfry-operator into a new instance with an `AWXRestore`, checks that the operator ran a migration Job for it and that it runs on PostgreSQL 18, and verifies the same data and a new job there;
+8. restores the PostgreSQL 18 backup of the upgraded instance into a third instance and verifies the data there.
 
-Since the move to PostgreSQL 18, a second variant of the test first upgrades to belfry-operator {{ release.version }} (PostgreSQL 15, with NetworkPolicies) and checks the data there, before switching to the tested operator.
+A second variant of the test first upgrades to belfry-operator 1.0.0 (PostgreSQL 15, with NetworkPolicies) and checks the data there, before switching to the tested operator.
 
 [Latest runs](https://github.com/belfry-project/belfry-operator/actions/workflows/upgrade-test.yml).
 

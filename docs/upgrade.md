@@ -55,9 +55,9 @@ The operator runs the database migrations in a Job (`<name>-migration-<hash>`) b
 
 ## PostgreSQL 18 { #postgresql-18 }
 
-belfry-operator {{ release.version }}, like awx-operator {{ awx.operator_version }}, runs the managed database on PostgreSQL 15 (`quay.io/sclorg/postgresql-15-c9s`). From the next release, it runs it on **PostgreSQL 18** (`quay.io/sclorg/postgresql-18-c10s`). PostgreSQL 15 gets fixes until November 2027, PostgreSQL 18 until November 2030, so the move gives Belfry three more years on a supported database, and the newer planner and I/O improvements.
+belfry-operator 1.0.0, like awx-operator {{ awx.operator_version }}, ran the managed database on PostgreSQL 15 (`quay.io/sclorg/postgresql-15-c9s`). From 1.1.0, belfry-operator runs it on **PostgreSQL 18** (`quay.io/sclorg/postgresql-18-c10s`). PostgreSQL 15 gets fixes until November 2027, PostgreSQL 18 until November 2030, so the move gives Belfry three more years on a supported database, and the newer planner and I/O improvements.
 
-The operator migrates each instance once, during its first reconciliation after the operator upgrade, the same way awx-operator moved from PostgreSQL 13 to 15:
+The operator migrates each instance once, during its first reconciliation after the upgrade from belfry-operator 1.0.0 or the [switch from awx-operator](migrate.md#5-watch-the-upgrade), the same way awx-operator moved from PostgreSQL 13 to 15:
 
 1. It scales down the web and task deployments. **Belfry is unavailable until the migration is done**, which takes about as long as a dump and restore of your database.
 2. It creates the StatefulSet `<name>-postgres-18` with a **new PVC** `postgres-18-<name>-postgres-18-0`, of the size and storage class in your `AWX` resource (`postgres_storage_requirements`, `postgres_storage_class`).
@@ -83,7 +83,7 @@ kubectl -n awx get awx awx -o jsonpath='{.status.upgradedPostgresVersion}{"\n"}'
 kubectl -n awx exec awx-postgres-18-0 -- psql -tAc 'SHOW server_version'
 ```
 
-Backups made from PostgreSQL 15, by belfry-operator {{ release.version }} or by awx-operator, restore into a PostgreSQL 18 database. The [upgrade test](migrate.md#what-the-upgrade-test-covers) checks the migration from AWX {{ awx.version }} and from belfry-operator {{ release.version }}, and backups and restores on both versions.
+Backups made from PostgreSQL 15, by belfry-operator 1.0.0 or by awx-operator, restore into a PostgreSQL 18 database. The [upgrade test](migrate.md#what-the-upgrade-test-covers) checks the migration from AWX {{ awx.version }} and from belfry-operator 1.0.0, and backups and restores on both versions.
 
 ## Upgrading instances one at a time
 
