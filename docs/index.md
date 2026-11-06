@@ -18,7 +18,7 @@ Upstream AWX releases have been paused since AWX 24.6.1 and awx-operator 2.19.1,
 Belfry continues from AWX's development branch as of November 2026, with all its unreleased fixes, and adds:
 
 - releases with [semantic versioning](releases.md), starting at **{{ release.version }}**;
-- current, supported components: Python, Django, ansible-core {{ release.ansible_core }}, Redis 8, a CentOS Stream 10 execution environment;
+- current, supported components: Python, Django, ansible-core {{ release.ansible_core }}, Redis 8 and, from the next release, [AlmaLinux 10](faq.md#why-almalinux) as the base of every image;
 - images built and published entirely on GitHub, for amd64 and arm64, with [build provenance and SBOMs](verify-images.md), and a daily scan for known vulnerabilities;
 - a [tested migration path](migrate.md) from AWX {{ awx.version }}.
 

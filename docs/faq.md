@@ -28,6 +28,19 @@ Like AWX, Belfry is only supported on Kubernetes, with the operator. The `docker
 
 In different namespaces, yes. Both operators manage the same resource kinds, so do not run both in the same namespace. The CRDs are cluster-wide and shared: belfry-operator's CRDs add fields and a few validations to those of awx-operator {{ awx.operator_version }}, so AWX keeps working with them (one validation: `image` and `image_version` must be set together, or neither).
 
+## Why AlmaLinux 10 and not CentOS? { #why-almalinux }
+
+From the release after {{ release.version }}, the Belfry application image, belfry-ee and the operator's init-projects container are built on [AlmaLinux 10](https://almalinux.org/), and Belfry runs on Python 3.14. {{ release.version }} still uses CentOS Stream 9 for the application and CentOS Stream 10 for belfry-ee, as AWX did with CentOS Stream 9.
+
+- **Stable instead of rolling.** CentOS Stream is the preview of the next RHEL minor release: packages land there before RHEL has released them, and there are no point releases to pin or test against. AlmaLinux 10 is a free rebuild of RHEL 10, with point releases and security errata.
+- **Longer support.** AlmaLinux 10 is supported until May 2035. CentOS Stream 9, which AWX uses, ends in May 2027, and CentOS Stream 10 around May 2030.
+- **The same packages as RHEL.** Package names and `dnf` work as on RHEL and CentOS, so Belfry's images keep AWX's structure, and your execution environments built on belfry-ee install system packages as before, including from EPEL.
+- **Free and redistributable,** with official images on quay.io (`quay.io/almalinuxorg/almalinux`).
+
+We also considered Rocky Linux 10 (technically equivalent), Red Hat UBI 10 (its free repositories lack packages Belfry needs to build), Debian or Ubuntu (a rewrite of the images without a gain for users), and minimal images such as Alpine (no rsyslog or nginx, and Python packages built for glibc do not work). The decision is recorded in [DECISIONS.md](https://github.com/belfry-project/.github/blob/main/DECISIONS.md).
+
+Python 3.14 is the newest Python in AlmaLinux 10, supported upstream until October 2030; AWX {{ awx.version }} runs on Python 3.11.
+
 ## Which UI does Belfry use?
 
 The Ansible UI that AWX's development branch uses ([belfry-ui](https://github.com/belfry-project/belfry-ui)), built from ansible-ui as of September 2024.

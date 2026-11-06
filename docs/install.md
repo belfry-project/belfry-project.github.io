@@ -11,7 +11,7 @@ Belfry runs on Kubernetes and is managed by **belfry-operator**: you install the
 - For a small instance, at least 2 CPUs and 4 GB of memory available, more for real workloads.
 - A default StorageClass, for the PostgreSQL volume (or bring your own database, see the [operator reference](https://belfry-project.github.io/docs/operator/user-guide/database-configuration.html)).
 - `kubectl` with access to the cluster, and [Helm](https://helm.sh/) 3 if you use the chart.
-- The nodes need to pull from `ghcr.io` (Belfry, the operator and the execution environment), `docker.io` (Redis) and `quay.io` (PostgreSQL and the CentOS init image). For disconnected clusters, mirror those images and set the image fields of the `AWX` resource.
+- The nodes need to pull from `ghcr.io` (Belfry, the operator and the execution environment), `docker.io` (Redis) and `quay.io` (PostgreSQL, and the init image for persistent projects: CentOS Stream 9 in {{ release.version }}, AlmaLinux 10 minimal from the next release). For disconnected clusters, mirror those images and set the image fields of the `AWX` resource.
 
 All commands below use the namespace `awx`, like awx-operator. You can choose another one.
 
