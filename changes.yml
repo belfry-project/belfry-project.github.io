@@ -35,16 +35,24 @@ changes:
         url: https://belfry-project.github.io/docs/migrate/
 
   - category: upgrade
-    title: Tested upgrade from AWX 24.6.1
+    title: Tested upgrade and backup/restore from AWX 24.6.1
     description: >-
       An existing AWX 24.6.1 installation is upgraded by replacing awx-operator 2.19.1
       with belfry-operator on the same AWX resource. An automated test does this every
       week on a fresh Kubernetes cluster: organizations, inventories, encrypted
       credentials, projects, job templates, finished jobs with their output and cached
       facts survive, and new jobs run in Belfry's execution environment with the
-      credentials created before the upgrade.
+      credentials created before the upgrade. The same test backs up the AWX 24.6.1
+      instance with awx-operator's AWXBackup and restores that backup with
+      belfry-operator's AWXRestore into a new instance, which then runs Belfry with all
+      the same data. Two restore bugs it found are fixed: backup and restore pods can
+      reach PostgreSQL through its NetworkPolicy, and a restore no longer leaves empty
+      secrets named after the new instance.
     links:
       - belfry-project/belfry-operator#14
+      - belfry-project/belfry-operator#17
+      - belfry-project/belfry-operator#23
+      - belfry-project/belfry-operator#25
     urls:
       - title: Latest test runs
         url: https://github.com/belfry-project/belfry-operator/actions/workflows/upgrade-test.yml
