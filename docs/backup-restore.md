@@ -79,4 +79,6 @@ The restore is done when the status shows `restoreComplete: true`. The operator 
 To restore from a backup that is not an `AWXBackup` resource any more, set `backup_pvc` and `backup_dir` instead of `backup_name`.
 
 !!! note "Tested"
-    The [upgrade test](migrate.md#what-the-upgrade-test-covers) is being extended ([belfry-operator#17](https://github.com/belfry-project/belfry-operator/pull/17)) to back up AWX {{ awx.version }} with awx-operator {{ awx.operator_version }}, restore it with belfry-operator into a new instance, and check the data, the credential secrets and a new job there.
+    The [upgrade test](migrate.md#what-the-upgrade-test-covers) backs up AWX {{ awx.version }} with awx-operator {{ awx.operator_version }}, restores it with belfry-operator into a new instance, and checks the data, the credential secrets and a new job there ([belfry-operator#17](https://github.com/belfry-project/belfry-operator/pull/17)).
+
+    Use a belfry-operator release that includes [#23](https://github.com/belfry-project/belfry-operator/pull/23) and [#25](https://github.com/belfry-project/belfry-operator/pull/25), which every release does: without #23, backup and restore pods could not reach the managed PostgreSQL on clusters that enforce NetworkPolicies, and without #25 a restore left empty `<new instance>-admin-password` and similar secrets.

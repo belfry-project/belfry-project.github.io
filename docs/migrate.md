@@ -106,6 +106,9 @@ If you manage the resource with Helm or GitOps, change it there instead.
 
 ## 4. Switch the operator
 
+!!! warning "All instances in the namespace are upgraded"
+    The operator manages every `AWX` resource in its namespace, so switching it upgrades all of them to Belfry at once. To keep an AWX instance on {{ awx.version }} while you try Belfry, move it to another namespace or cluster first, or try Belfry on a copy: [restore your backup](#rolling-back) into another namespace or cluster that runs belfry-operator.
+
 Install belfry-operator **over** awx-operator, in the same namespace. It uses the same deployment name (`awx-operator-controller-manager`), CRDs and RBAC names, so the old operator is replaced, not run next to it. Your `AWX`, `AWXBackup` and `AWXRestore` resources stay.
 
 === "Kustomize (tested)"
@@ -295,7 +298,7 @@ Then delete the old execution environment if nothing uses it.
 The restored `AWX` resource gets the spec from the backup, so it runs AWX {{ awx.version }} again.
 
 !!! note "Restoring the AWX backup with belfry-operator"
-    You can also restore the AWX {{ awx.version }} backup with **belfry-operator**: the restored instance then runs Belfry, and the operator migrates the restored database with a migration Job. This is how to start over if the in-place switch failed halfway, or how to migrate into a new instance (or another cluster) while the AWX instance keeps running. The restored instance gets the admin password of the AWX instance; read it from the secret named in `status.adminPasswordSecret` of the new `AWX` resource. This path is being added to the upgrade test ([belfry-operator#17](https://github.com/belfry-project/belfry-operator/pull/17)).
+    You can also restore the AWX {{ awx.version }} backup with **belfry-operator**: the restored instance then runs Belfry, and the operator migrates the restored database with a migration Job. This is how to start over if the in-place switch failed halfway, or how to migrate into a new instance (or another cluster) while the AWX instance keeps running. The restored instance gets the admin password of the AWX instance; read it from the secret named in `status.adminPasswordSecret` of the new `AWX` resource. The upgrade test covers this path.
 
 ## What the upgrade test covers
 
@@ -303,10 +306,10 @@ The workflow [`upgrade-test.yml`](https://github.com/belfry-project/belfry-opera
 
 1. installs awx-operator {{ awx.operator_version }} (with the kube-rbac-proxy image from quay.io) and an `AWX` resource without image fields, which runs AWX {{ awx.version }};
 2. creates an organization, an inventory with a host, a credential with a secret, a project from Git, a job template, and runs a job that uses the secret and caches facts;
-3. backs it up with an `AWXBackup` (being added in [belfry-operator#17](https://github.com/belfry-project/belfry-operator/pull/17));
+3. backs it up with an `AWXBackup`;
 4. applies belfry-operator's `config/default` over awx-operator (`make deploy`) and waits until the web and task deployments run the Belfry image;
 5. checks that the version changed, that all objects, the old job with its output and the cached facts survived, and that a new job runs in `belfry-ee`, decrypts the old credential and updates the facts;
-6. being added in [belfry-operator#17](https://github.com/belfry-project/belfry-operator/pull/17): deletes that instance, restores the {{ awx.version }} backup with belfry-operator into a new instance with an `AWXRestore`, checks that the operator ran a migration Job for it, and verifies the same data and a new job there.
+6. deletes that instance and its kept secrets and PostgreSQL volume, restores the {{ awx.version }} backup with belfry-operator into a new instance with an `AWXRestore`, checks that the operator ran a migration Job for it, and verifies the same data and a new job there.
 
 [Latest runs](https://github.com/belfry-project/belfry-operator/actions/workflows/upgrade-test.yml).
 
