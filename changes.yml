@@ -153,6 +153,18 @@ changes:
       released by the AWX project.
 
   - category: fixes
+    title: A restore that failed halfway can be retried
+    description: >-
+      A restore over a database that already has AWX's tables failed, because the
+      partitioned job event tables cannot be cleaned by pg_restore. So an AWXRestore that
+      failed halfway could not be retried, and restoring into an existing instance failed.
+      The operator now drops and recreates the database it manages before restoring. An
+      external database is only dropped and recreated with force_drop_db, as before.
+    links:
+      - belfry-project/belfry-operator#35
+    unreleased: true
+
+  - category: fixes
     title: Receptor and the operator base image rebuilt with security fixes
     description: >-
       AWX ships the receptor binary and builds the operator on the ansible-operator
