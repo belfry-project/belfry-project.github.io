@@ -153,6 +153,21 @@ changes:
       released by the AWX project.
 
   - category: fixes
+    title: The manual's API reference documents Belfry's API
+    description: >-
+      The REST API reference in the AWX manual showed a 2023 Swagger 2.0 description of
+      AWX's API, downloaded from AWS S3, because its Swagger UI was too old for OpenAPI 3.
+      Belfry's manual renders the OpenAPI 3 schema of the latest Belfry release with a
+      current Swagger UI that is shipped with the manual, so the page loads nothing from
+      other sites.
+    links:
+      - belfry-project/belfry#48
+    urls:
+      - title: API reference
+        url: https://belfry-project.github.io/docs/belfry/rest_api/api_ref.html
+    unreleased: true
+
+  - category: fixes
     title: Web UI dependencies updated, without high or critical advisories
     description: >-
       The web UI was built from ansible-ui as of September 2024, with dependencies that
