@@ -153,6 +153,25 @@ changes:
       released by the AWX project.
 
   - category: fixes
+    title: Web UI dependencies updated, without high or critical advisories
+    description: >-
+      The web UI was built from ansible-ui as of September 2024, with dependencies that
+      npm audit reported 5 critical and 36 high advisories for, among them open redirect
+      and cross-site scripting issues in libraries that run in the browser (React Router,
+      DOMPurify). Belfry updates the UI's dependencies to current releases within their
+      major versions, and moves build and test tools (webpack plugins, Vite,
+      webpack-dev-server, Cypress) to new major versions, leaving no critical or high
+      advisories. The UI still uses React 18 and PatternFly 5. Every change to the UI
+      is now built and tested automatically.
+    links:
+      - belfry-project/belfry-ui#11
+      - belfry-project/belfry-ui#13
+      - belfry-project/belfry-ui#17
+      - belfry-project/belfry-ui#18
+      - belfry-project/belfry-ui#19
+    unreleased: true
+
+  - category: fixes
     title: A restore that failed halfway can be retried
     description: >-
       A restore over a database that already has AWX's tables failed, because the
