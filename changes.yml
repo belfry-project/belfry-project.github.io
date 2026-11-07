@@ -21,7 +21,6 @@ categories:
 changes:
   - category: features
     title: Save a direct playbook run as a job template
-    unreleased: true
     description: >-
       A job that ran a playbook directly from a project can be saved as a job template,
       for example to schedule it: with the "Save as job template" action on the job page,
