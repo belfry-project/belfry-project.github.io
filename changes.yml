@@ -20,6 +20,21 @@ categories:
 
 changes:
   - category: features
+    title: Host overview in one API call
+    description: >-
+      GET /api/v2/hosts/{id}/overview/ returns a host with its variables, its direct and
+      inherited groups, its facts (all or selected ones), the last job of every job
+      template that ran on it and its most recent jobs and ad hoc commands, for anyone
+      who can read the host. The awx.awx collection has a host_overview module and the
+      awx CLI an "awx hosts overview" command for it.
+    links:
+      - belfry-project/belfry#59
+    urls:
+      - title: Host overview
+        url: https://belfry-project.github.io/docs/belfry/rest_api/host_overview.html
+    unreleased: true
+
+  - category: features
     title: Search hosts by facts with operators
     description: >-
       Host filters and smart inventories could only match a fact exactly. They now
