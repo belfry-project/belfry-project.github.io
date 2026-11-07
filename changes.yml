@@ -160,8 +160,11 @@ changes:
       failed halfway could not be retried, and restoring into an existing instance failed.
       The operator now drops and recreates the database it manages before restoring. An
       external database is only dropped and recreated with force_drop_db, as before.
+      The database user gets the CREATEDB privilege only while the database is restored,
+      also when the restore fails.
     links:
       - belfry-project/belfry-operator#35
+      - belfry-project/belfry-operator#39
     unreleased: true
 
   - category: fixes
@@ -237,10 +240,13 @@ changes:
     description: >-
       AWX builds install several dependencies from moving branches, so the same release
       could produce different images. Belfry pins every dependency to an exact version
-      or commit. Renovate proposes updates as pull requests, which go through CI.
+      or commit. Renovate proposes updates as pull requests, which go through CI. The
+      execution environment pins its base image by digest, its collections to exact
+      versions and installs awxkit from the latest Belfry release.
     links:
       - belfry-project/belfry#3
       - belfry-project/belfry-ee#2
+      - belfry-project/belfry-ee#19
 
   - category: build
     title: Multi-architecture images on GitHub Container Registry
@@ -295,8 +301,11 @@ changes:
     description: >-
       Belfry no longer depends on Quay, Ansible Galaxy, PyPI, SonarCloud, AWS or Red Hat's
       internal build system (Konflux) to build or release. Everything runs on GitHub
-      Actions and is published to GitHub.
+      Actions and is published to GitHub. The OpenAPI schema of each release is attached
+      to its GitHub release, and pull requests are checked against the schema of their
+      base branch instead of one on AWS S3.
     links:
       - belfry-project/belfry#11
+      - belfry-project/belfry#43
       - belfry-project/belfry-operator#5
       - belfry-project/belfry-ee#2
