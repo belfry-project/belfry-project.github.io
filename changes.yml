@@ -20,6 +20,36 @@ categories:
 
 changes:
   - category: features
+    title: Web UI for running playbooks, fact search and the host overview
+    description: >-
+      The web UI uses the new API features. Projects have a Run playbook action that runs
+      a playbook of the project with an inventory, credentials, limit, extra variables and
+      the other job options, and opens the job output. The hosts lists can be filtered by
+      facts with the new operators (Filter by facts builds the condition), the filter is
+      kept in the URL so it can be shared, and the smart inventory form can add fact
+      conditions. Hosts have an Overview tab with their facts (searchable), groups,
+      variables, the last result per job template and recent jobs. The help menu links
+      to the API explorer.
+    links:
+      - belfry-project/belfry-ui#22
+      - belfry-project/belfry-ui#23
+      - belfry-project/belfry-ui#24
+      - belfry-project/belfry-ui#21
+      - belfry-project/belfry#61
+    unreleased: true
+
+  - category: fixes
+    title: Project and template pages open again
+    description: >-
+      The project, job template, workflow job template and management job pages showed a
+      Bad Request error instead of their details, because the web UI asked the API for
+      notification admin organizations with an old role name that the new RBAC rejects.
+      They now ask with the matching permission.
+    links:
+      - belfry-project/belfry-ui#26
+    unreleased: true
+
+  - category: features
     title: Host overview in one API call
     description: >-
       GET /api/v2/hosts/{id}/overview/ returns a host with its variables, its direct and
