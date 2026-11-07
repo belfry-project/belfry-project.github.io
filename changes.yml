@@ -176,14 +176,16 @@ changes:
       DOMPurify). Belfry updates the UI's dependencies to current releases within their
       major versions, and moves build and test tools (webpack plugins, Vite,
       webpack-dev-server, Cypress) to new major versions, leaving no critical or high
-      advisories. The UI still uses React 18 and PatternFly 5. Every change to the UI
-      is now built and tested automatically.
+      advisories. React Router moves to version 7, which fixes the last advisory in
+      code that runs in the browser. The UI still uses React 18 and PatternFly 5.
+      Every change to the UI is now built and tested automatically.
     links:
       - belfry-project/belfry-ui#11
       - belfry-project/belfry-ui#13
       - belfry-project/belfry-ui#17
       - belfry-project/belfry-ui#18
       - belfry-project/belfry-ui#19
+      - belfry-project/belfry-ui#20
     unreleased: true
 
   - category: fixes
