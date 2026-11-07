@@ -265,9 +265,11 @@ changes:
       AWX's API, downloaded from AWS S3, because its Swagger UI was too old for OpenAPI 3.
       Belfry's manual renders the OpenAPI 3 schema of the latest Belfry release with a
       current Swagger UI that is shipped with the manual, so the page loads nothing from
-      other sites.
+      other sites. The OpenAPI schema page uses Redoc 2.5 instead of Redoc 1.21 from 2019,
+      also shipped with the manual.
     links:
       - belfry-project/belfry#48
+      - belfry-project/belfry#63
     urls:
       - title: API reference
         url: https://belfry-project.github.io/docs/belfry/rest_api/api_ref.html
