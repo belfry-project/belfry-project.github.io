@@ -20,6 +20,22 @@ categories:
 
 changes:
   - category: features
+    title: Search hosts by facts with operators
+    description: >-
+      Host filters and smart inventories could only match a fact exactly. They now
+      support operators on facts: case-insensitive and partial text matches
+      (icontains, startswith, endswith, ...), a list of values (in), missing or present
+      facts (isnull, exists), numeric comparisons (gt, gte, lt, lte) and version
+      comparisons (vgte=9.2 matches 9.2 and 9.10 but not 9.1), for example
+      ansible_facts__ansible_distribution_version__vgte=9.2. PostgreSQL evaluates them.
+    links:
+      - belfry-project/belfry#57
+    urls:
+      - title: Searching hosts by facts
+        url: https://belfry-project.github.io/docs/belfry/rest_api/fact_search.html
+    unreleased: true
+
+  - category: features
     title: Run a playbook directly from a project
     description: >-
       A playbook of a project can be run without creating a job template first, through
