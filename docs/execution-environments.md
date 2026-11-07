@@ -11,7 +11,7 @@ Jobs run in an execution environment (EE): a container image with ansible-core, 
 | ansible-core | {{ awx.ansible_core }} | {{ release.ansible_core }} |
 | Architectures | amd64, arm64 | amd64, arm64 |
 
-It also contains ansible-runner, receptor, `awxkit`, `ansible-sign`, git, git-lfs, subversion, rsync, sshpass, Kerberos and WinRM/PSRP support, `podman-remote`, and these collections: `awx.awx`, `amazon.aws`, `azure.azcollection`, `google.cloud`, `openstack.cloud`, `community.vmware`, `ovirt.ovirt`, `kubernetes.core`, `kubevirt.core`, `ansible.posix`, `ansible.windows`, `theforeman.foreman` and `redhatinsights.insights`. The exact definition is [`execution-environment.yml`](https://github.com/belfry-project/belfry-ee/blob/main/execution-environment.yml); the exact versions of every package are in the image's [SBOM](verify-images.md#sboms).
+It also contains ansible-runner, receptor, `awxkit`, `ansible-sign`, git, git-lfs, subversion, rsync, sshpass, Kerberos and WinRM/PSRP support, `podman-remote`, and these collections: `awx.awx` (Belfry's own, from the Belfry release; AWX's EE has upstream 24.6.1), `amazon.aws`, `azure.azcollection`, `google.cloud`, `openstack.cloud`, `community.vmware`, `ovirt.ovirt`, `kubernetes.core`, `kubevirt.core`, `ansible.posix`, `ansible.windows`, `theforeman.foreman` and `redhatinsights.insights`. The exact definition is [`execution-environment.yml`](https://github.com/belfry-project/belfry-ee/blob/main/execution-environment.yml); the exact versions of every package are in the image's [SBOM](verify-images.md#sboms).
 
 Tags: `:{{ release.version }}` for a release, `:latest` for the newest release, `:main` for the newest build of `main` (see [Releases and support](releases.md#image-tags)).
 
