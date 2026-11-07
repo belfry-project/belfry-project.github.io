@@ -20,6 +20,23 @@ categories:
 
 changes:
   - category: features
+    title: Save a direct playbook run as a job template
+    unreleased: true
+    description: >-
+      A job that ran a playbook directly from a project can be saved as a job template,
+      for example to schedule it: with the "Save as job template" action on the job page,
+      the API (POST /api/v2/jobs/ID/create_job_template/) or the awx CLI (awx jobs
+      create_job_template). The template gets the job's playbook, inventory, credentials,
+      instance groups, variables and settings. Relaunching such a job now also keeps the
+      instance groups it was started with.
+    links:
+      - belfry-project/belfry#65
+      - belfry-project/belfry-ui#28
+    urls:
+      - title: Documentation
+        url: https://belfry-project.github.io/docs/belfry/rest_api/launch_playbook.html
+
+  - category: features
     title: Web UI for running playbooks, fact search and the host overview
     description: >-
       The web UI uses the new API features. Projects have a Run playbook action that runs
