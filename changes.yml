@@ -5,6 +5,8 @@
 # not about the implementation. Newest changes first within a category.
 
 categories:
+  - id: features
+    title: New features
   - id: upgrade
     title: Upgrading from AWX
   - id: support
@@ -17,6 +19,22 @@ categories:
     title: Independent of Red Hat infrastructure
 
 changes:
+  - category: features
+    title: Run a playbook directly from a project
+    description: >-
+      A playbook of a project can be run without creating a job template first, through
+      the API (POST /api/v2/projects/ID/launch_playbook/), the awx.awx.playbook_launch
+      module and the awx CLI (awx projects launch_playbook). The run is a normal job with
+      output, events, cancel and relaunch. It needs the same permissions as creating a job
+      template from the same project, inventory and credentials. Administrators can turn
+      it off with the ALLOW_DIRECT_PLAYBOOK_LAUNCH setting.
+    links:
+      - belfry-project/belfry#58
+    urls:
+      - title: Documentation
+        url: https://belfry-project.github.io/docs/belfry/rest_api/launch_playbook.html
+    unreleased: true
+
   - category: upgrade
     title: Documentation for installing Belfry and migrating from AWX
     description: >-
