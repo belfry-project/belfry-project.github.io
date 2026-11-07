@@ -36,7 +36,6 @@ changes:
       - belfry-project/belfry-ui#24
       - belfry-project/belfry-ui#21
       - belfry-project/belfry#61
-    unreleased: true
 
   - category: fixes
     title: Project and template pages open again
@@ -47,7 +46,6 @@ changes:
       They now ask with the matching permission.
     links:
       - belfry-project/belfry-ui#26
-    unreleased: true
 
   - category: features
     title: Host overview in one API call
@@ -62,7 +60,6 @@ changes:
     urls:
       - title: Host overview
         url: https://belfry-project.github.io/docs/belfry/rest_api/host_overview.html
-    unreleased: true
 
   - category: features
     title: Search hosts by facts with operators
@@ -78,7 +75,6 @@ changes:
     urls:
       - title: Searching hosts by facts
         url: https://belfry-project.github.io/docs/belfry/rest_api/fact_search.html
-    unreleased: true
 
   - category: features
     title: Run a playbook directly from a project
@@ -94,7 +90,6 @@ changes:
     urls:
       - title: Documentation
         url: https://belfry-project.github.io/docs/belfry/rest_api/launch_playbook.html
-    unreleased: true
 
   - category: features
     title: API explorer on every instance and a browsable API reference
@@ -113,7 +108,6 @@ changes:
         url: https://belfry-project.github.io/docs/api/
       - title: API reference
         url: https://belfry-project.github.io/docs/belfry/rest_api/api_ref.html
-    unreleased: true
 
   - category: features
     title: A modern browsable API
@@ -128,7 +122,6 @@ changes:
     urls:
       - title: Browsable API
         url: https://belfry-project.github.io/docs/belfry/rest_api/browseable.html
-    unreleased: true
 
   - category: upgrade
     title: Documentation for installing Belfry and migrating from AWX
@@ -278,7 +271,6 @@ changes:
     urls:
       - title: API reference
         url: https://belfry-project.github.io/docs/belfry/rest_api/api_ref.html
-    unreleased: true
 
   - category: fixes
     title: Web UI dependencies updated, without high or critical advisories
@@ -299,7 +291,6 @@ changes:
       - belfry-project/belfry-ui#18
       - belfry-project/belfry-ui#19
       - belfry-project/belfry-ui#20
-    unreleased: true
 
   - category: fixes
     title: A restore that failed halfway can be retried
@@ -314,7 +305,6 @@ changes:
     links:
       - belfry-project/belfry-operator#35
       - belfry-project/belfry-operator#39
-    unreleased: true
 
   - category: fixes
     title: Receptor and the operator base image rebuilt with security fixes
