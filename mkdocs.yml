@@ -131,6 +131,7 @@ nav:
       - Upgrading Belfry: upgrade.md
       - Backup and restore: backup-restore.md
       - Execution environments: execution-environments.md
+      - Using the API: api.md
   - Trust and support:
       - Verifying images: verify-images.md
       - Security: security.md

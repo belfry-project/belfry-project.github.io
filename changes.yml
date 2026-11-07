@@ -66,6 +66,40 @@ changes:
         url: https://belfry-project.github.io/docs/belfry/rest_api/launch_playbook.html
     unreleased: true
 
+  - category: features
+    title: API explorer on every instance and a browsable API reference
+    description: >-
+      Every Belfry instance has an interactive API explorer at /api/v2/docs/ (Swagger UI,
+      and ReDoc at /api/v2/docs/redoc/). "Try it out" sends requests with your browser
+      session or with a username and password under "Authorize", with your own
+      permissions. Swagger UI and ReDoc are served by Belfry itself instead of being
+      loaded from a CDN, and credentials are not stored in the browser. The API
+      reference in the manual has a filter, an index of the endpoint groups, links per
+      operation and an introduction to authentication, pagination and filtering.
+    links:
+      - belfry-project/belfry#55
+    urls:
+      - title: Using the API
+        url: https://belfry-project.github.io/docs/api/
+      - title: API reference
+        url: https://belfry-project.github.io/docs/belfry/rest_api/api_ref.html
+    unreleased: true
+
+  - category: features
+    title: A modern browsable API
+    description: >-
+      The API pages at /api/ in a browser have a new look in the style of the web UI,
+      with dark mode, a collapsible JSON view in which every API path is a link,
+      breadcrumbs, the login state, links to the API explorer and the web UI, and
+      clearer forms for POST, PUT, PATCH and DELETE. The pages no longer load Bootstrap
+      or jQuery. API responses are unchanged.
+    links:
+      - belfry-project/belfry#56
+    urls:
+      - title: Browsable API
+        url: https://belfry-project.github.io/docs/belfry/rest_api/browseable.html
+    unreleased: true
+
   - category: upgrade
     title: Documentation for installing Belfry and migrating from AWX
     description: >-
