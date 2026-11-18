@@ -55,6 +55,16 @@ changes:
       - belfry-project/belfry#61
 
   - category: fixes
+    title: Jobs run with podman 6
+    description: >-
+      Podman 6 (AlmaLinux 10.3) removed the slirp4netns network stack, so jobs run with
+      podman, as in the development environment, failed. Job containers now use pasta by
+      default (setting DEFAULT_CONTAINER_RUN_OPTIONS is now --network pasta); an explicitly
+      configured value is kept.
+    links:
+      - belfry-project/belfry#68
+
+  - category: fixes
     title: Project and template pages open again
     description: >-
       The project, job template, workflow job template and management job pages showed a

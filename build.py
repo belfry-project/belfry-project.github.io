@@ -26,13 +26,13 @@ UPSTREAM = {
 }
 # Last ansible/awx commit merged into belfry (created from a498310675, synced
 # since); update after an upstream sync, see SYNCING.md in belfry-project/.github.
-BELFRY_UPSTREAM_BASE = 'fe6cd9d45a'
+BELFRY_UPSTREAM_BASE = '8a6af80c3d'
 # Belfry repositories, with the last upstream commit merged into each (None for new repositories)
 BELFRY_REPOS = {
     'belfry': BELFRY_UPSTREAM_BASE,
     'belfry-ee': 'b8da008',
-    'belfry-operator': '76470a4',
-    'helm-charts': 'fc0b6db',
+    'belfry-operator': 'fc0c3c3',
+    'helm-charts': '39c7bde',
     'belfry-ui': '96dcf0b',
     '.github': None,
     'belfry-project.github.io': None,
